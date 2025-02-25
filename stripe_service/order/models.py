@@ -9,14 +9,17 @@ class Order(models.Model):
     """
     items = models.ManyToManyField(
         'item.Item',
+        through='OrderItem',
         related_name='orders',
         verbose_name="Товары в заказе"
     )
     total_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=0.00,
-        verbose_name="Общая стоимость заказа"
+        null=True,
+        blank=True,
+        verbose_name="Общая стоимость заказа",
+
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -36,7 +39,39 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f"Заказ {self.id} - {self.total_price} {self.items.first().currency}"
+        return f"Заказ {self.pk} - {self.total_price}"
+
+    def recalculate_total_price(self):
+        """
+        Пересчитывает итоговую стоимость заказа.
+        """
+        total_summ = sum(item.price for item in self.items.all())
+
+        for tax in self.taxes.all():
+            total_summ += total_summ * tax.rate / 100
+
+        for discount in self.discounts.all():
+            if discount.is_percentage:
+                total_summ -= total_summ * discount.value / 100
+            else:
+                total_summ -= discount.value
+
+        self.total_price = round(total_summ, 2)
+
+
+class OrderItem(models.Model):
+    """
+    Промежуточная модель для связи заказов и товаров с количеством.
+    """
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    item = models.ForeignKey('item.Item', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item.name}"
+
+    class Meta:
+        unique_together = ('order', 'item')
 
 
 class Tax(models.Model):
@@ -50,8 +85,8 @@ class Tax(models.Model):
     )
     rate = models.DecimalField(
         max_digits=5,
-        decimal_places=4,
-        verbose_name="Ставка налога (например, 0.20 для 20%)"
+        decimal_places=2,
+        verbose_name="Ставка налога (например 20%)"
     )
     description = models.TextField(
         blank=True,
