@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список товаров</title>
+
+    <!-- Подключение Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Список товаров</h1>
+
+    <div class="row">
+        {% for item in items %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-primary">{{ item.name }}</h5>
+                        <p class="card-text">{{ item.description }}</p>
+                        <p class="fw-bold text-success">Цена: {{ item.price }} {{ item.currency }}</p>
+                        <button class="btn btn-primary w-100 mb-2" onclick="buyNow({{ item.id }})">Купить</button>
+                        <button class="btn btn-warning w-100" onclick="addToCart({{ item.id }})">Добавить в корзину</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function buyNow(itemId) {
+        alert("Перенаправляем на оплату товара " + itemId);
+        // Можно сделать редирект на /buy/{id}
+    }
+
+    function addToCart(itemId) {
+        alert("Товар " + itemId + " добавлен в корзину!");
+        // AJAX-запрос для добавления в корзину
+    }
+</script>
+
+</body>
+</html>
