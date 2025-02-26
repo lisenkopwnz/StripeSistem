@@ -24,6 +24,51 @@
 </head>
 <body>
 
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Магазин</a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <!-- Кнопка для открытия модального окна -->
+                    <li class="nav-item">
+                        <button class="nav-link btn btn-danger text-white px-3" data-bs-toggle="modal" data-bs-target="#logoutModal">Выйти</button>
+                    </li>
+                {% endif %}
+                <li class="nav-item me-2">
+                    <a class="nav-link btn btn-primary text-white px-3" href="{% url 'user:login' %}">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-success text-white px-3" href="{% url 'user:register' %}">Регистрация</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Модальное окно для подтверждения выхода -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Подтверждение выхода</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите выйти из системы?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form method="post" action="{% url 'user:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Выйти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-5">
     <h1 class="text-center mb-4">Список товаров</h1>
 
